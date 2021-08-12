@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="20e798d5-eefd-4450-8137-9118608a7047" name="Default Changelist" comment="" />
+    <list id="477cb8b0-8c08-4047-9160-5328e30259ad" name="Changes by kusha" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="1vuZwrUoN5SfF7YZn6vqWJvBLz4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="codeWithMe.voiceChat.enabledByDefault" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../proj2" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="DemoInputSource" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="byow.InputDemo.DemoInputSource" />
+      <module name="proj3" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="byow.InputDemo.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Hallway" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="byow.Core.Hallway" />
+      <module name="proj3" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="byow.Core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="byow.Core.Main" />
+      <module name="proj3" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="byow.Core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Room" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="byow.Core.Room" />
+      <module name="proj3" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="byow.Core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.DemoInputSource" />
+      <item itemvalue="Application.Hallway" />
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.Room" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Room" />
+        <item itemvalue="Application.Hallway" />
+        <item itemvalue="Application.DemoInputSource" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="20e798d5-eefd-4450-8137-9118608a7047" name="Default Changelist" comment="" />
+      <created>1627414175962</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1627414175962</updated>
+      <workItem from="1627414177527" duration="734000" />
+      <workItem from="1627493556364" duration="3044000" />
+      <workItem from="1627522658727" duration="5440000" />
+      <workItem from="1627580049547" duration="380000" />
+      <workItem from="1627603207467" duration="2269000" />
+      <workItem from="1627614333266" duration="9997000" />
+      <workItem from="1627666379281" duration="58000" />
+      <workItem from="1627681876686" duration="1950000" />
+      <workItem from="1627689524186" duration="23910000" />
+      <workItem from="1627757618812" duration="626000" />
+      <workItem from="1627767076109" duration="7530000" />
+      <workItem from="1627787453483" duration="10871000" />
+      <workItem from="1627849755214" duration="14975000" />
+      <workItem from="1627872772602" duration="1225000" />
+      <workItem from="1627893367450" duration="2000" />
+      <workItem from="1627936685540" duration="90000" />
+      <workItem from="1627936789400" duration="5000" />
+      <workItem from="1627936797644" duration="53000" />
+      <workItem from="1627936904400" duration="180000" />
+      <workItem from="1627937116866" duration="177000" />
+      <workItem from="1627937319610" duration="598000" />
+      <workItem from="1627957130699" duration="799000" />
+      <workItem from="1627973141452" duration="2000" />
+      <workItem from="1628019738590" duration="109000" />
+      <workItem from="1628035250291" duration="894000" />
+      <workItem from="1628040107289" duration="3000" />
+      <workItem from="1628136257605" duration="1897000" />
+      <workItem from="1628138352882" duration="125000" />
+      <workItem from="1628138497375" duration="6861000" />
+      <workItem from="1628175948848" duration="6305000" />
+      <workItem from="1628203815172" duration="8511000" />
+      <workItem from="1628272916788" duration="2371000" />
+      <workItem from="1628286937675" duration="20180000" />
+      <workItem from="1628353502169" duration="9357000" />
+      <workItem from="1628399678308" duration="25325000" />
+      <workItem from="1628476683310" duration="12900000" />
+      <workItem from="1628494478496" duration="126000" />
+      <workItem from="1628541347775" duration="7656000" />
+      <workItem from="1628556313846" duration="1000" />
+      <workItem from="1628556426926" duration="2000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+</project>

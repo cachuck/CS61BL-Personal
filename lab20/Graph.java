@@ -1,0 +1,436 @@
+import java.util.*;
+
+public class Graph implements Iterable<Integer>{
+    public class PriorityItem implements Comparable<PriorityItem> {
+        public int node;
+        public int distance;
+        private PriorityItem(int node, HashMap<Integer, Integer> distances){
+            this.node = node;
+            this.distance = distances.get(node);
+        }
+
+        @Override
+        public int compareTo(PriorityItem n){
+            if (this.distance < n.distance) {
+                return -1;
+            }
+            if (this.distance > n.distance){
+                return 1;
+            }
+            return 0;
+        }
+
+
+    }
+
+    private LinkedList<Edge>[] adjLists;
+    private int vertexCount;
+
+
+    /* Initializes a graph with NUMVERTICES vertices and no Edges. */
+    public Graph(int numVertices) {
+        adjLists = (LinkedList<Edge>[]) new LinkedList[numVertices];
+        for (int k = 0; k < numVertices; k++) {
+            adjLists[k] = new LinkedList<Edge>();
+        }
+        vertexCount = numVertices;
+    }
+
+
+
+    /* Adds Dijkstra's alogrithm */
+    public List<Integer> shortestPath(int start, int stop) {
+        HashMap<Integer, Integer> vertexDistToStartVertex = new HashMap<>(); // vertices to distance from start vertex
+        int[] predecessors = new int[vertexCount];
+        predecessors[start] = start;
+        PriorityQueue<PriorityItem> pq = new PriorityQueue<>();
+        ArrayList<Integer> visitedVerts = new ArrayList<>();
+        vertexDistToStartVertex.put(start, 0);
+        pq.add(new PriorityItem(start, vertexDistToStartVertex));
+        int closestVertex = start; //ensures this int is global, as in it does not "disappear" after the while loop is terminated
+        while (!pq.isEmpty()) { //loop until fringe is empty
+            closestVertex = pq.poll().node; // closestVertex is the vertex in fringe w/shortest distance to start (or highest priority). Remove and hold onto v.
+            visitedVerts.add(closestVertex); //
+            if (closestVertex == stop) { //exit loop if the closest vertex is the stop node
+                break;
+            }
+            for (int neighbor : neighbors(closestVertex)) { // get edge for each neighbor
+                Edge e = getEdge(closestVertex, neighbor);
+                // int distance = adjLists[closestVertex].get(i).weight;
+                // neighbor
+                if (!visitedVerts.contains(neighbor)) { //ensures we dont visit the same node twice
+                    if (!vertexDistToStartVertex.containsKey(neighbor)){ //same as above, but for the PriorityQueue data structure
+                        vertexDistToStartVertex.put(neighbor, e.weight + vertexDistToStartVertex.get(closestVertex));
+                        pq.add(new PriorityItem(neighbor, vertexDistToStartVertex)); //adds neighbor to PriorityQueue (it is not there already)
+                        predecessors[neighbor] = closestVertex;
+
+                    } else {
+                        int newDistance = e.weight + vertexDistToStartVertex.get(closestVertex);
+                        if (newDistance < vertexDistToStartVertex.get(neighbor)){
+                            vertexDistToStartVertex.put(neighbor, newDistance);
+                            predecessors[neighbor] = closestVertex;
+                            pq.add(new PriorityItem(neighbor,vertexDistToStartVertex));
+                        }
+                    }
+                }
+            }
+        }
+        LinkedList<Integer> pathToReturn = new LinkedList<>();
+        int node = stop;
+        while (predecessors[node] != start) {
+            pathToReturn.addFirst(predecessors[node]);
+            node = predecessors[node];
+        }
+        pathToReturn.addFirst(start);
+        pathToReturn.addLast(stop);
+        return pathToReturn;
+    }
+
+    public Edge getEdge(int u, int v) {
+        for (int i = 0; i< adjLists[u].size(); i++){
+            if (adjLists[u].get(i).to == v){
+                return adjLists[u].get(i);
+            }
+        }
+        return null;
+    }
+
+
+    /*
+    Initialization
+1. Maintain a mapping, from vertices to their distance from the start vertex. This will be used by the fringe to determine the next vertex to visit. We will use a priority queue to implement this fringe. Here, an item’s priority is its distance from the start vertex.
+2. Add the start vertex to the fringe with distance/priority zero.
+3. All other nodes can be left out of the fringe. If a node is not in the fringe, assume it has distance infinity.
+4. For each vertex, keep track of which other node is the predecessor for the node along the shortest path found.
+     */
+
+
+    /* Adds a directed Edge (V1, V2) to the graph. That is, adds an edge
+       in ONE directions, from v1 to v2. */
+    public void addEdge(int v1, int v2) {
+        addEdge(v1, v2, 0);
+    }
+
+    /* Adds an undirected Edge (V1, V2) to the graph. That is, adds an edge
+       in BOTH directions, from v1 to v2 and from v2 to v1. */
+    public void addUndirectedEdge(int v1, int v2) {
+        addUndirectedEdge(v1, v2, 0);
+    }
+
+    /* Adds a directed Edge (V1, V2) to the graph with weight WEIGHT. If the
+       Edge already exists, replaces the current Edge with a new Edge with
+       weight WEIGHT. */
+    public void addEdge(int v1, int v2, int weight) {
+        Edge toAdd = new Edge(v1, v2, weight);
+        for (Edge edge : adjLists[v1]) { // consider using isAdjacent
+            if (edge.from == v1 && edge.to == v2) {
+                edge.weight = weight;
+                return;
+            }
+        }
+        adjLists[v1].add(toAdd);
+    }
+
+    /* Adds an undirected Edge (V1, V2) to the graph with weight WEIGHT. If the
+       Edge already exists, replaces the current Edge with a new Edge with
+       weight WEIGHT. */
+    public void addUndirectedEdge(int v1, int v2, int weight) {
+        addEdge(v1, v2, weight);
+        addEdge(v2, v1, weight);
+    }
+
+    /* Returns true if there exists an Edge from vertex FROM to vertex TO.
+       Returns false otherwise. */
+    public boolean isAdjacent(int from, int to) {
+        for (Edge edge : adjLists[from]) {
+            if (edge.to == to) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Returns a list of all the vertices u such that the Edge (V, u)
+       exists in the graph. */
+    public List<Integer> neighbors(int v) {
+        ArrayList<Integer> neighbors = new ArrayList<>();
+        for (Edge edge : adjLists[v]){
+            neighbors.add(edge.to);
+        }
+        return neighbors;
+    }
+    /* Returns the number of incoming Edges for vertex V. */
+    public int inDegree(int v) {
+        int counter = 0;
+        for (LinkedList<Edge> vertFrom : adjLists) {
+            for (Edge edge : vertFrom){
+                if (edge.to == v){
+                    counter++;
+                }
+            }
+        }
+        return counter;
+    }
+
+    /* Returns an Iterator that outputs the vertices of the graph in topological
+       sorted order. */
+    public Iterator<Integer> iterator() {
+        return new TopologicalIterator();
+    }
+
+    /**
+     *  A class that iterates through the vertices of this graph,
+     *  starting with a given vertex. Does not necessarily iterate
+     *  through all vertices in the graph: if the iteration starts
+     *  at a vertex v, and there is no path from v to a vertex w,
+     *  then the iteration will not include w.
+     */
+    private class DFSIterator implements Iterator<Integer> {
+
+        private Stack<Integer> fringe;
+        private HashSet<Integer> visited;
+
+        public DFSIterator(Integer start) {
+            fringe = new Stack<>();
+            visited = new HashSet<>();
+            fringe.push(start);
+        }
+
+        public boolean hasNext() {
+            if (!fringe.isEmpty()) {
+                int i = fringe.pop();
+                while (visited.contains(i)) {
+                    if (fringe.isEmpty()) {
+                        return false;
+                    }
+                    i = fringe.pop();
+                }
+                fringe.push(i);
+                return true;
+            }
+            return false;
+        }
+
+        public Integer next() {
+            int curr = fringe.pop();
+            ArrayList<Integer> lst = new ArrayList<>();
+            for (int i : neighbors(curr)) {
+                lst.add(i);
+            }
+            lst.sort((Integer i1, Integer i2) -> -(i1 - i2));
+            for (Integer e : lst) {
+                fringe.push(e);
+            }
+            visited.add(curr);
+            return curr;
+        }
+
+        //ignore this method
+        public void remove() {
+            throw new UnsupportedOperationException(
+                    "vertex removal not implemented");
+        }
+
+    }
+
+    /* Returns the collected result of performing a depth-first search on this
+       graph's vertices starting from V. */
+    public List<Integer> dfs(int v) {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        Iterator<Integer> iter = new DFSIterator(v);
+
+        while (iter.hasNext()) {
+            result.add(iter.next());
+        }
+        return result;
+    }
+
+    /* Returns true iff there exists a path from START to STOP. Assumes both
+       START and STOP are in this graph. If START == STOP, returns true. */
+    public boolean pathExists(int start, int stop) {
+        if (start == stop) {
+            return true;
+        }
+        return (dfs(start).contains(stop));
+    }
+
+
+    /* Returns the path from START to STOP. If no path exists, returns an empty
+       List. If START == STOP, returns a List with START. */
+    public List<Integer> path(int start, int stop) {
+        LinkedList<Integer> path = new LinkedList<>();
+        if (!pathExists(start, stop)) {
+            return new ArrayList<>();
+        }
+        path.add(stop); // NEEDS THIS??
+        List<Integer> visited = dfs(start);
+        int curr = stop;
+        while(!(neighbors(start).contains(curr))) {
+            for (int i : visited) {
+                if (neighbors(i).contains(curr)) {
+                    path.addFirst(i);
+                    curr = i;
+                    break;
+                }
+            }
+        }
+        path.addFirst(start);
+        return path;
+    }
+
+    public List<Integer> topologicalSort() {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        Iterator<Integer> iter = new TopologicalIterator();
+        while (iter.hasNext()) {
+            result.add(iter.next());
+        }
+        return result;
+    }
+
+    private class TopologicalIterator implements Iterator<Integer> {
+
+        //private Stack<Integer> fringe;
+        //private HashSet<Edge> visited;
+        private Stack<Integer> fringe;
+        private int[] currentInDegree;
+
+        TopologicalIterator() {
+
+            fringe = new Stack<Integer>();
+            //Queue<Integer> fringe = new LinkedList<Integer>();
+            currentInDegree = new int[vertexCount];
+            for (int i : currentInDegree){
+                currentInDegree[i] = inDegree(i);
+                if (inDegree(i) == 0) fringe.push(i);
+            }
+        }
+
+        public boolean hasNext() { //am confusion.
+            return !fringe.isEmpty();
+        }
+
+        public Integer next() {
+        int curr = fringe.pop();
+        for (int i : neighbors(curr)){
+            if (currentInDegree[i] != 0){
+                currentInDegree[i]--;
+                if (currentInDegree[i] == 0) fringe.push(i);
+            }
+        }
+            return curr;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private class Edge {
+
+        private int from;
+        private int to;
+        private int weight;
+
+        Edge(int from, int to, int weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
+        }
+
+        public String toString() {
+            return "(" + from + ", " + to + ", weight = " + weight + ")";
+        }
+
+    }
+
+    private void generateG1() {
+        addEdge(0, 1);
+        addEdge(0, 2);
+        addEdge(0, 4);
+        addEdge(1, 2);
+        addEdge(2, 0);
+        addEdge(2, 3);
+        addEdge(4, 3);
+    }
+
+    private void generateG2() {
+        addEdge(0, 1);
+        addEdge(0, 2);
+        addEdge(0, 4);
+        addEdge(1, 2);
+        addEdge(2, 3);
+        addEdge(4, 3);
+    }
+
+    private void generateG3() {
+        addUndirectedEdge(0, 2);
+        addUndirectedEdge(0, 3);
+        addUndirectedEdge(1, 4);
+        addUndirectedEdge(1, 5);
+        addUndirectedEdge(2, 3);
+        addUndirectedEdge(2, 6);
+        addUndirectedEdge(4, 5);
+    }
+
+    private void generateG4() {
+        addEdge(0, 1);
+        addEdge(1, 2);
+        addEdge(2, 0);
+        addEdge(2, 3);
+        addEdge(4, 2);
+    }
+
+    private void printDFS(int start) {
+        System.out.println("DFS traversal starting at " + start);
+        List<Integer> result = dfs(start);
+        Iterator<Integer> iter = result.iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next() + " ");
+        }
+        System.out.println();
+        System.out.println();
+    }
+
+    private void printPath(int start, int end) {
+        System.out.println("Path from " + start + " to " + end);
+        List<Integer> result = path(start, end);
+        if (result.size() == 0) {
+            System.out.println("No path from " + start + " to " + end);
+            return;
+        }
+        Iterator<Integer> iter = result.iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next() + " ");
+        }
+        System.out.println();
+        System.out.println();
+    }
+
+    private void printTopologicalSort() {
+        System.out.println("Topological sort");
+        List<Integer> result = topologicalSort();
+        Iterator<Integer> iter = result.iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next() + " ");
+        }
+    }
+
+    public static void main(String[] args) {
+        Graph g1 = new Graph(5);
+        g1.generateG1();
+        g1.printDFS(0);
+        g1.printDFS(2);
+        g1.printDFS(3);
+        g1.printDFS(4);
+
+        g1.printPath(0, 3);
+        g1.printPath(0, 4);
+        g1.printPath(1, 3);
+        g1.printPath(1, 4);
+        g1.printPath(4, 0);
+
+        Graph g2 = new Graph(5);
+        g2.generateG2();
+        g2.printTopologicalSort();
+    }
+}

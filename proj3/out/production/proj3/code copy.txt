@@ -1,0 +1,383 @@
+package byow.Core;
+import byow.Core.Engine;
+import byow.TileEngine.TERenderer;
+import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.awt.Point;
+
+public class Room {
+
+    // TETile[][] world = Engine.world;
+    // Random randGen = Engine.rand;
+/*    private int WIDTH; // removed final for main method
+    private int HEIGHT;
+    public Random randGen;
+    public TETile[][] world;*/
+/*
+    public static void main(String[] args) {
+        //Random randGen = new Random(821);
+        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        Engine engine = new Engine();
+        engine.interactWithInputString(args[0]);
+        TERenderer ter = new TERenderer();
+        ter.initialize(engine.WIDTH, engine.HEIGHT);
+        drawWorld(engine);
+        ter.renderFrame(engine.world);
+    }*/
+
+    public static void drawWorld(Engine engine) {
+        Random randGen = engine.rand;
+        TETile[][] world = engine.world;
+        int WIDTH = engine.WIDTH;
+        int HEIGHT = engine.HEIGHT;
+        generateBoard(randGen, world, WIDTH, HEIGHT);
+        generateRooms(randGen, world, WIDTH, HEIGHT);
+    }
+/*
+    private static final int WIDTH = 120;
+    private static final int HEIGHT = 80;
+    public static void main(String[] args) {
+        Random randGen = new Random(21352);
+        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        TETile[][] world = new TETile[WIDTH][HEIGHT];
+*/
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///// BEGIN GRID DRAWING ///// BEGIN GRID DRAWING ///// BEGIN GRID DRAWING ///// BEGIN GRID DRAWING ///// BEGIN GRID DRAWING /////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Initializes empty tiles
+    public static void generateBoard(Random randGen, TETile[][] world, int WIDTH, int HEIGHT) {
+/*        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                world[x][y] = Tileset.NOTHING;
+            }
+        }*/
+
+        // Sets perimeter to be a certain boundary tile.
+        int pickTile = randGen.nextInt(4);
+        for (int x = 0; x < WIDTH; x++) {
+            switch (pickTile) {
+                case 0:
+                    world[x][HEIGHT - 1] = Tileset.MOUNTAIN;
+                    world[x][0] = Tileset.MOUNTAIN;
+                    break;
+                case 1:
+                    world[x][HEIGHT - 1] = Tileset.TREE;
+                    world[x][0] = Tileset.TREE;
+                    break;
+                case 2:
+                    world[x][HEIGHT - 1] = Tileset.GRASS;
+                    world[x][0] = Tileset.GRASS;
+                    break;
+                default:
+                    world[x][HEIGHT - 1] = Tileset.WATER;
+                    world[x][0] = Tileset.WATER;
+            }
+        }
+        pickTile = randGen.nextInt(4);
+        for (int y = 0; y < HEIGHT; y++) {
+            switch (pickTile) {
+                case 0:
+                    world[WIDTH - 1][y] = Tileset.MOUNTAIN;
+                    world[0][y] = Tileset.MOUNTAIN;
+                    break;
+                case 1:
+                    world[WIDTH - 1][y] = Tileset.TREE;
+                    world[0][y] = Tileset.TREE;
+                    break;
+                case 2:
+                    world[WIDTH - 1][y] = Tileset.GRASS;
+                    world[0][y] = Tileset.GRASS;
+                    break;
+                default:
+                    world[WIDTH - 1][y] = Tileset.WATER;
+                    world[0][y] = Tileset.WATER;
+            }
+        }
+    }
+
+    ///// BEGIN ROOM DRAWING ///// BEGIN ROOM DRAWING ///// BEGIN ROOM DRAWING ///// BEGIN ROOM DRAWING ///// BEGIN ROOM DRAWING /////
+    // Keeps track of certain wall points that will later be used to generate hallways.
+    public static void generateRooms(Random randGen, TETile[][] world, int WIDTH, int HEIGHT) {
+        HashMap<Point, String> hallwayDirectionPoint = new HashMap<>();
+        // Dictates number of rooms generated. Psuedorandom, with a lower and upper bound.
+        // Recommended: (bound: 15) + 25
+        int numRooms = randGen.nextInt(15) + 25;
+        // ROOM GENERATOR. Assigns all rooms values, then creates them on the grid.
+        for (int roomCount = 0; roomCount < numRooms; roomCount++) {
+            int roomWidth = randGen.nextInt(9) + 6;
+            int roomHeight = randGen.nextInt(9) + 6;
+            // rXP was 101 & rYP was 61
+            int roomXPos = randGen.nextInt(WIDTH-19) + 3;
+            int roomYPos = randGen.nextInt(HEIGHT-19) + 3;
+
+            for (int widthDrawn = 0; widthDrawn < roomWidth; widthDrawn++) {
+                for (int heightDrawn = 0; heightDrawn < roomHeight; heightDrawn++) {
+                    if (world[roomXPos + widthDrawn][roomYPos + heightDrawn] == Tileset.NOTHING) {
+                        world[roomXPos + widthDrawn][roomYPos + heightDrawn] = Tileset.WALL;
+                    }
+                }
+            }
+            for (int widthDrawn = 1; widthDrawn < roomWidth - 1; widthDrawn++) {
+                for (int heightDrawn = 1; heightDrawn < roomHeight - 1; heightDrawn++) {
+                    world[roomXPos + widthDrawn][roomYPos + heightDrawn] = Tileset.FLOOR;
+                    int spawnBatteryChance = randGen.nextInt(30);
+                    if (spawnBatteryChance == 0) {
+                        world[roomXPos + widthDrawn][roomYPos + heightDrawn] = Tileset.BATTERY;
+                    }
+                    int spawnNPCChance = randGen.nextInt(80);
+                    if (spawnNPCChance == 0) {
+                        world[roomXPos + widthDrawn][roomYPos + heightDrawn] = Tileset.FLOWER;
+                    }
+                }
+            }
+            createHallwayStartPoints(world, roomXPos, roomYPos, roomWidth, roomHeight, hallwayDirectionPoint);
+        }
+        generateHallways(hallwayDirectionPoint, randGen, world);
+        generateHallways(hallwayDirectionPoint, randGen, world);
+    }
+
+    // Adds specific wall points + directions to a HashMap that will be used to later draw connecting hallways.
+    // 1. West (rXP, rH/2) 2. East (rXP+rW, rH/2) 3. South (rW/2, rYP) 4. North (rW/2, rYP+rH)
+    public static void createHallwayStartPoints(TETile[][] world, int roomXPos, int roomYPos, int roomWidth, int roomHeight, HashMap<Point, String> hallwayDirectionPoint) {
+
+        int northX = roomXPos + roomWidth / 2;
+        int northY = roomYPos + roomHeight - 1;
+        int eastX = roomXPos + roomWidth - 1;
+        int eastY = roomYPos + roomHeight / 2;
+        int southX = roomXPos + roomWidth / 2;
+        int southY = roomYPos;
+        int westX = roomXPos;
+        int westY = roomYPos + roomHeight / 2;
+        if (world[northX][northY] == Tileset.WALL) {
+            Point northPoint = new Point(northX, northY);
+            hallwayDirectionPoint.put(northPoint, "NORTH");
+            //world[northX][northY] = Tileset.FLOWER;
+        }
+        if (world[eastX][eastY] == Tileset.WALL) {
+            Point eastPoint = new Point(eastX, eastY);
+            hallwayDirectionPoint.put(eastPoint, "EAST");
+            //world[eastX][eastY] = Tileset.FLOWER;
+        }
+        if (world[southX][southY] == Tileset.WALL) {
+            Point southPoint = new Point(southX, southY);
+            hallwayDirectionPoint.put(southPoint, "SOUTH");
+            //world[southX][southY] = Tileset.FLOWER;
+        }
+        if (world[westX][westY] == Tileset.WALL) {
+            Point westPoint = new Point(westX, westY);
+            hallwayDirectionPoint.put(westPoint, "WEST");
+            //world[westX][westY] = Tileset.FLOWER;
+        }
+    }
+
+///// BEGIN HALL DRAWING ///// BEGIN HALL DRAWING ///// BEGIN HALL DRAWING ///// BEGIN HALL DRAWING ///// BEGIN HALL DRAWING /////
+    public static void generateHallways(HashMap<Point, String> hallwayDirectionPoint, Random randGen, TETile[][] world) {
+        for (Map.Entry<Point, String> entries : hallwayDirectionPoint.entrySet()) {
+            int hallWidth = randGen.nextInt(2) + 1; // Returns 1 or 2
+            int startingX = entries.getKey().x;
+            int startingY = entries.getKey().y;
+            String direction = entries.getValue();
+            // Ensures that a starting point has not already been overwritten. SHOULD be a safety measure, due to the hallway checking tiles as it iterates.
+            if (!(world[startingX][startingY] == Tileset.WALL || world[startingX][startingY] == Tileset.FLOWER)) {
+                continue;
+            }
+            // DOCUMENTATION WILL BE FOR NORTH DIRECTION. SAME LOGIC APPLIES TO EACH CARDINAL DIRECTION.
+            if (direction.equals("NORTH")) {
+                boolean stopped = false;
+                // Number of tiles NORTH of starting point that is checked
+                int amountNorth = 1;
+                while (!stopped) {
+                    if (world[startingX][startingY + amountNorth] == Tileset.WALL) {
+                        // Constructs super hallway
+                        if ((world[startingX][startingY + 1] == Tileset.WALL && world[startingX-1][startingY] == Tileset.WALL && world[startingX+1][startingY] == Tileset.WALL)) {
+                            superhall(world, startingX, startingY);
+                        }
+                        // Ensures hallway exit point is not blocked off and does not lead to outside world
+                        else if (world[startingX][startingY + amountNorth + 1] == Tileset.WALL || world[startingX][startingY + amountNorth + 1] == Tileset.NOTHING) {
+                            break;
+                        }
+                        // Constructs hallway
+                        for (int widthDrawn = startingX - hallWidth; widthDrawn <= startingX + 1; widthDrawn++) {
+                            for (int heightDrawn = startingY; heightDrawn <= startingY + amountNorth; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.WALL;
+                            }
+                        }
+                        for (int widthDrawn = startingX - hallWidth + 1; widthDrawn <= startingX; widthDrawn++) {
+                            for (int heightDrawn = startingY; heightDrawn <= startingY + amountNorth; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.FLOOR;
+                            }
+                        }
+                    }
+                    else if (world[startingX][startingY + amountNorth] == Tileset.NOTHING) {
+                        amountNorth++;
+                    }
+                    else if (!(world[startingX][startingY + amountNorth] == Tileset.WALL || world[startingX][startingY + amountNorth] == Tileset.NOTHING)) {
+                        stopped = true;
+                    }
+                    else {
+                        System.out.println("Error in hallway search algorithm. This should never be printed.");
+                        break;
+                    }
+                }
+            }
+            else if (direction.equals("EAST")) {
+                boolean stopped = false;
+                int amountEast = 1;
+                while (!stopped) {
+                    if (world[startingX + amountEast][startingY] == Tileset.WALL) { // if it runs into a wall build hall
+                        if ((world[startingX+1][startingY] == Tileset.WALL && world[startingX][startingY+1] == Tileset.WALL && world[startingX][startingY-1] == Tileset.WALL)) {
+                            superhall(world, startingX, startingY);
+                        }
+                        else if (world[startingX + amountEast + 1][startingY] == Tileset.WALL || world[startingX + amountEast + 1][startingY] == Tileset.NOTHING) {
+                            break;
+                        }
+                        for (int widthDrawn = startingX; widthDrawn <= startingX + amountEast; widthDrawn++) { // builds hallway of 3, 4 width
+                            for (int heightDrawn = startingY - 1; heightDrawn <= startingY + hallWidth; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.WALL;
+                            }
+                        }
+                        for (int widthDrawn = startingX; widthDrawn <= startingX + amountEast; widthDrawn++) {
+                            for (int heightDrawn = startingY; heightDrawn < startingY + hallWidth; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.FLOOR;
+                            }
+                        }
+                    }
+                    else if (world[startingX + amountEast][startingY] == Tileset.NOTHING) {
+                        amountEast++;
+                    }
+                    else if (!(world[startingX + amountEast][startingY] == Tileset.WALL || world[startingX + amountEast][startingY] == Tileset.NOTHING)) {
+                        stopped = true;
+                    }
+                    else {
+                        System.out.println("Error in hallway search algorithm. This should never be printed.");
+                        break;
+                    }
+                }
+            }
+            else if (direction.equals("SOUTH")) {
+                boolean stopped = false;
+                int amountSouth = 1;
+                while (!stopped) {
+                    if (world[startingX][startingY - amountSouth] == Tileset.WALL) {
+                        if ((world[startingX][startingY - 1] == Tileset.WALL && world[startingX-1][startingY] == Tileset.WALL && world[startingX+1][startingY] == Tileset.WALL)) {
+                            superhall(world, startingX, startingY);
+                        }
+                        else if (world[startingX][startingY - (amountSouth + 1)] == Tileset.WALL || world[startingX][startingY - (amountSouth + 1)] == Tileset.NOTHING) {
+                            break;
+                        }
+                        for (int widthDrawn = startingX - 1; widthDrawn <= startingX + hallWidth; widthDrawn++) {
+                            for (int heightDrawn = startingY; heightDrawn >= startingY - amountSouth; heightDrawn--) {
+                                world[widthDrawn][heightDrawn] = Tileset.WALL;
+                            }
+                        }
+                        for (int widthDrawn = startingX; widthDrawn < startingX + hallWidth; widthDrawn++) {
+                            for (int heightDrawn = startingY; heightDrawn >= startingY - amountSouth; heightDrawn--) {
+                                world[widthDrawn][heightDrawn] = Tileset.FLOOR;
+                            }
+                        }
+                    }
+                    else if (world[startingX][startingY - amountSouth] == Tileset.NOTHING) {
+                        amountSouth++;
+                    }
+                    else if (!(world[startingX][startingY - amountSouth] == Tileset.WALL || world[startingX][startingY - amountSouth] == Tileset.NOTHING)) {
+                        stopped = true;
+                    }
+                    else {
+                        System.out.println("Error in hallway search algorithm. This should never be printed.");
+                        break;
+                    }
+                }
+            }
+            else if (direction.equals("WEST")) {
+                boolean stopped = false;
+                int amountWest = 1;
+                while (!stopped) {
+                    if (world[startingX - amountWest][startingY] == Tileset.WALL) {
+                        if ((world[startingX-1][startingY] == Tileset.WALL && world[startingX][startingY+1] == Tileset.WALL && world[startingX][startingY-1] == Tileset.WALL)) {
+                            superhall(world, startingX, startingY);
+                        }
+                        else if (world[startingX - (amountWest + 1)][startingY] == Tileset.WALL || world[startingX - (amountWest + 1)][startingY] == Tileset.NOTHING) {
+                            break;
+                        }
+                        for (int widthDrawn = startingX; widthDrawn >= startingX - amountWest; widthDrawn--) {
+                            for (int heightDrawn = startingY - hallWidth; heightDrawn <= startingY + 1; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.WALL;
+                            }
+                        }
+                        for (int widthDrawn = startingX; widthDrawn >= startingX - amountWest; widthDrawn--) {
+                            for (int heightDrawn = startingY - (hallWidth - 1); heightDrawn <= startingY; heightDrawn++) {
+                                world[widthDrawn][heightDrawn] = Tileset.FLOOR;
+                            }
+                        }
+                    }
+                    else if (world[startingX - amountWest][startingY] == Tileset.NOTHING) {
+                        amountWest++;
+                    }
+                    else if (!(world[startingX - amountWest][startingY] == Tileset.WALL || world[startingX - amountWest][startingY] == Tileset.NOTHING)) {
+                        stopped = true;
+                    }
+                    else {
+                        System.out.println("Error in hallway search algorithm. This should never be printed.");
+                        break;
+                    }
+                }
+            }
+            else {
+                System.out.println("Error in hallway drawing --> " + direction + " " + startingX + " " + startingY);
+            }
+        }
+    }
+
+    private static void superhall(TETile[][] world, int startingX, int startingY) {
+        for (int widthDrawn = startingX - 2; widthDrawn <= startingX + 2; widthDrawn++) {
+            for (int heightDrawn = startingY - 2; heightDrawn <= startingY + 2; heightDrawn++) {
+                if (world[widthDrawn][heightDrawn] == Tileset.NOTHING) {
+                    world[widthDrawn][heightDrawn] = Tileset.WALL;
+                }
+            }
+        }
+        for (int widthDrawn = startingX - 1; widthDrawn <= startingX + 1; widthDrawn++) {
+            for (int heightDrawn = startingY - 1; heightDrawn <= startingY + 1; heightDrawn++) {
+                world[widthDrawn][heightDrawn] = Tileset.FLOOR;
+            }
+        }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///// END HALL DRAWING ///// END HALL DRAWING ///// END HALL DRAWING ///// END HALL DRAWING ///// END HALL DRAWING ///////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+}
+
+//TODO: DO NOT COPY ANYTHING BELOW THIS LINE
+
+// When generating rooms, randomly take one coordinate from each cardinal side of the room. This point will NOT be near an edge,
+// to account for the width of a hallway.
+
+// These coordinates will be placed into a data structure (ArrayList, Map, etc). A Map will allow us to store direction (whether
+// the wall is facing north, east, etc).
+
+/*
+HALLWAY ALGO: Another idea: cap at 2 hallways per room?
+Another idea: at the end of each hallway, create a small room =====[ ] would this solve N820S?
+
+IDEA 8/2: Instead of looking for a wall, either:
+1. Look for a FLOOR
+2. Look for a WALL & FLOOR pair, which means if there is a double-thick wall but a floor behind, it will find the last-most wall and the floor behind it, and create a hallway through.
+    This solves the case for hitting the edge/border of a room and going all the way through, because even though it hits a wall, it will never find a wall/floor pair.
+
+SUPERHALL ALGO: (sub-method)
+If room tests EVERY direction and does not create a wall, create a super hall.
+1. Checks which quadrant of the map it is in
+2. Creates a hall to midpoint
+3. If left of center, go right, if right of center, to left
+4. Extend hallway all the way to world border -- if and only if left and right are empty, build walls.
+5. If path is blocked by a wall, replace wall with floor
+ */
+// take midpoint of top and bottom sides of the room or midpt of left and right, from top you have double for loop
+// first for loop goes through every pt above midpt (top) and then scans horizontal of that pt
